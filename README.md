@@ -1,8 +1,11 @@
 # GrapeSwaggerRails
 
-[![Build Status](https://travis-ci.org/BrandyMint/grape-swagger-rails.svg)](https://travis-ci.org/BrandyMint/grape-swagger-rails)
+[![Gem Version](https://badge.fury.io/rb/grape-swagger-rails.svg)](http://badge.fury.io/rb/grape-swagger-rails)
+[![Build Status](https://travis-ci.org/ruby-grape/grape-swagger-rails.svg)](https://travis-ci.org/ruby-grape/grape-swagger-rails)
+[![Dependency Status](https://gemnasium.com/ruby-grape/grape-swagger-rails.svg)](https://gemnasium.com/ruby-grape/grape-swagger-rails)
+[![Code Climate](https://codeclimate.com/github/ruby-grape/grape-swagger-rails/badges/gpa.svg)](https://codeclimate.com/github/ruby-grape/grape-swagger-rails)
 
-Swagger UI as Rails Engine for grape-swagger gem
+Swagger UI as Rails Engine for grape-swagger gem.
 
 ## Installation
 
@@ -20,6 +23,15 @@ Or install it yourself as:
 
     $ gem install grape-swagger-rails
 
+## Compatibility
+
+GrapeSwaggerRails is compatible with the following versions of grape and grape-swagger.
+
+grape  | grape-swagger
+-------|--------------
+0.9.0  | 0.8.0
+0.10.0 | 0.9.0
+
 ## Usage
 
 Add this line to `./config/routes.rb`:
@@ -33,6 +45,14 @@ Create an initializer (e.g. `./config/initializers/swagger.rb`) and specify the 
 ```ruby
 GrapeSwaggerRails.options.url      = '/swagger_doc.json'
 GrapeSwaggerRails.options.app_url  = 'http://swagger.wordnik.com'
+``````
+
+You can dynamically set `app_url` for each request use a `before_filter_proc`:
+
+```ruby
+GrapeSwaggerRails.options.before_filter_proc = proc {
+  GrapeSwaggerRails.options.app_url = request.protocol + request.host_with_port
+}
 ```
 
 You can set the app name, default is "Swagger".
@@ -45,6 +65,20 @@ You can specify additional headers to add to each request:
 
 ```ruby
 GrapeSwaggerRails.options.headers['Special-Header'] = 'Some Secret Value'
+```
+
+You can set docExpansion with "none" or "list" or "full", default is "none".
+See the official Swagger-UI documentation about [SwaggerUi Parameters](https://github.com/swagger-api/swagger-ui#parameters).
+
+```ruby
+GrapeSwaggerRails.options.doc_expansion = 'list'
+```
+
+You can set validatorUrl to your own locally deployed Swagger validator, or disable validation by setting this option to nil.
+This is useful to avoid error messages when running Swagger-UI on a server which is not accessible from outside your network.
+
+```ruby
+GrapeSwaggerRails.options.validator_url = nil
 ```
 
 Using the `headers` option above, you could hard-code Basic Authentication credentials.
@@ -90,14 +124,51 @@ GrapeSwaggerRails.options.before_filter do |request|
 end
 ```
 
-## Contributing
-
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
-
 ### Updating Swagger UI from Dist
 
-To update Swagger UI from its [distribution](https://github.com/wordnik/swagger-ui), run 'bundle exec rake swagger_ui:dist:update'. Examine the changes carefully.
+To update Swagger UI from its [distribution](https://github.com/wordnik/swagger-ui), run `bundle exec rake swagger_ui:dist:update`. Examine the changes carefully.
+
+NOTE: This action should be run part of this gem (not your application). In case if you want to
+make it up-to-date, clone the repo, run the rake task, examine the diff, fix any bugs, make sure
+tests pass and then send PR here.
+
+### Enabling in a Rails-API Project
+
+The grape-swagger-rails gem uses the Rails asset pipeline for its Javascript and CSS. Enable the asset pipeline with [rails-api](https://github.com/rails-api/rails-api).
+
+Add sprockets to `config/application.rb`.
+
+```ruby
+require 'sprockets/railtie'
+```
+
+Include JavaScript in `app/assets/javascripts/application.js`.
+
+```javascript
+//
+//= require_tree .
+```
+
+Include CSS stylesheets in `app/assets/stylesheets/application.css`.
+
+```css
+/*
+*= require_tree .
+*/
+```
+
+## Contributors
+
+* [unloved](https://github.com/unloved)
+* [dapi](https://github.com/dapi)
+* [joelvh](https://github.com/joelvh)
+* [dblock](https://github.com/dblock)
+* ... and [more](https://github.com/ruby-grape/grape-swagger-rails/graphs/contributors) ...
+
+## Contributing
+
+See [CONTRIBUTING](CONTRIBUTING.md).
+
+## License
+
+MIT License, see [LICENSE](LICENSE.txt).
